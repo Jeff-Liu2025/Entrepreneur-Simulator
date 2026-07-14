@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创业模拟器 · 像素版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #1a1c2c;
+            --bg-light: #2b2b45;
+            --panel: #1e2035;
+            --border: #5d5d8a;
+            --text: #f4f4f4;
+            --text-dim: #a0a0b8;
+            --accent: #ffcc00;
+            --danger: #ff4d6d;
+            --success: #4ade80;
+            --info: #5d8aff;
+            --shadow: #0b0c18;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        body {
+            font-family: 'Press Start 2P', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* CRT 扫描线效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.08) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* 像素边框工具类 */
+        .pixel-box {
+            background: var(--panel);
+            border: 4px solid var(--border);
+            box-shadow:
+                4px 4px 0 var(--shadow),
+                inset -4px -4px 0 rgba(0,0,0,0.2),
+                inset 4px 4px 0 rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        .pixel-box::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 4px solid var(--border);
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        /* 像素按钮 */
+        .pixel-btn {
+            background: var(--bg-light);
+            color: var(--text);
+            border: 4px solid var(--border);
+            padding: 12px 20px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 var(--shadow);
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-transform: uppercase;
+        }
+
+        .pixel-btn:hover {
+            background: var(--info);
+            color: #fff;
+        }
+
+        .pixel-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0 0 0 var(--shadow);
+        }
+
+        .pixel-btn.primary {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: #ffd633;
+        }
+
+        .pixel-btn.primary:hover {
+            background: #ffe066;
+        }
+
+        .pixel-btn.danger {
+            background: var(--danger);
+            color: #fff;
+            border-color: #ff7a8f;
+        }
+
+        .pixel-btn.success {
+            background: var(--success);
+            color: var(--bg);
+            border-color: #86efac;
+        }
+
+        /* 容器 */
+        #app {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: var(--accent);
+            text-shadow: 4px 4px 0 var(--shadow);
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        /* 角色选择 */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .char-card {
+            background: var(--panel);
+            border: 4px solid var(--border);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 6px 6px 0 var(--shadow);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .char-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .char-card:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0 0 0 var(--shadow);
+        }
+
+        .char-avatar {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            background: var(--bg-light);
+            border: 4px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .char-name {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .char-tag {
+            font-size: 9px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .char-era {
+            font-size: 9px;
+            color: var(--success);
+        }
+
+        /* 游戏主界面 */
+        .game-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .narrative-panel {
+            padding: 24px;
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 4px dashed var(--border);
+        }
+
+        .node-year {
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        .node-progress {
+            color: var(--text-dim);
+            font-size: 10px;
+        }
+
+        .narrative-text {
+            background: var(--bg);
+            border: 4px solid var(--border);
+            padding: 20px;
+            min-height: 140px;
+            font-size: 12px;
+            line-height: 2;
+            color: var(--text);
+            margin-bottom: 20px;
+            box-shadow: inset 4px 4px 0 rgba(0,0,0,0.3);
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .choice-label {
+            color: var(--accent);
+            margin-right: 8px;
+        }
+
+        .choice-effect {
+            font-size: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .effect-good { color: var(--success); }
+        .effect-bad { color: var(--danger); }
+        .effect-neutral { color: var(--info); }
+
+        /* 状态面板 */
+        .status-panel {
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .status-title {
+            color: var(--accent);
+            font-size: 11px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .stat-row {
+            margin-bottom: 20px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            margin-bottom: 8px;
+        }
+
+        .stat-bar {
+            height: 16px;
+            background: var(--bg);
+            border: 3px solid var(--border);
+            position: relative;
+        }
+
+        .stat-fill {
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--success),
+                var(--success) 8px,
+                #86efac 8px,
+                #86efac 16px
+            );
+            transition: width 0.5s steps(10);
+        }
+
+        .stat-fill.warning {
+            background: repeating-linear-gradient(
+                90deg,
+                var(--danger),
+                var(--danger) 8px,
+                #ff7a8f 8px,
+                #ff7a8f 16px
+            );
+        }
+
+        .stat-value {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 9px;
+            color: var(--text);
+            text-shadow: 1px 1px 0 var(--bg);
+        }
+
+        /* 反馈弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--panel);
+            border: 6px solid var(--border);
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 8px 8px 0 var(--shadow);
+            text-align: center;
+        }
+
+        .modal-title {
+            color: var(--accent);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            font-size: 11px;
+            line-height: 2;
+            color: var(--text);
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .modal-effects {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .effect-tag {
+            padding: 8px 12px;
+            border: 3px solid;
+            font-size: 10px;
+        }
+
+        /* 复盘模式 */
+        .review-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .review-card {
+            padding: 16px;
+            border: 4px solid var(--border);
+            background: var(--bg);
+        }
+
+        .review-card.yours {
+            border-color: var(--accent);
+        }
+
+        .review-card.history {
+            border-color: var(--success);
+        }
+
+        .review-label {
+            font-size: 9px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .review-choice {
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .review-note {
+            background: var(--bg);
+            border: 4px solid var(--border);
+            padding: 16px;
+            font-size: 10px;
+            line-height: 2;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+
+        .review-note strong {
+            color: var(--accent);
+        }
+
+        .review-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .char-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .review-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pixel-btn {
+                font-size: 10px;
+                padding: 10px 14px;
+            }
+
+            .narrative-text {
+                font-size: 11px;
+            }
+        }
+
+        /* 闪烁动画 */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        /* 浮动效果 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .float {
+            animation: float 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>创业模拟器</h1>
+            <p>回到那个关键节点，做出你的选择</p>
+        </div>
+
+        <!-- 角色选择界面 -->
+        <div id="screen-select" class="screen active">
+            <div class="pixel-box" style="text-align: center; padding: 20px;">
+                <p style="font-size: 12px; color: var(--accent);">选择你想体验的人生</p>
+            </div>
+            <div class="char-grid">
+                <div class="char-card" onclick="startGame('internet')">
+                    <div class="char-avatar float">🌐</div>
+                    <div class="char-name">李风</div>
+                    <div class="char-tag">互联网 · 平台</div>
+                    <div class="char-era">1999 - 2014</div>
+                </div>
+                <div class="char-card" onclick="startGame('hardware')">
+                    <div class="char-avatar float" style="animation-delay: 0.2s;">📱</div>
+                    <div class="char-name">陈默</div>
+                    <div class="char-tag">硬件 · 科技制造</div>
+                    <div class="char-era">2010 - 2020</div>
+                </div>
+                <div class="char-card" onclick="startGame('retail')">
+                    <div class="char-avatar float" style="animation-delay: 0.4s;">🛒</div>
+                    <div class="char-name">王启明</div>
+                    <div class="char-tag">消费 · 零售</div>
+                    <div class="char-era">2015 - 2023</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏主界面 -->
+        <div id="screen-game" class="screen">
+            <div class="game-layout">
+                <div class="narrative-panel pixel-box">
+                    <div class="node-header">
+                        <span class="node-year">📅 2000年 · 融资危机</span>
+                        <span class="node-progress">节点 2/7</span>
+                    </div>
+                    <div class="narrative-text">
+                        你站在出租屋窗前，手里攥着辞职信。互联网泡沫正在兴起，朋友们都说你疯了。银行账户里的积蓄只够撑3个月...
+                    </div>
+                    <div class="choices">
+                        <button class="pixel-btn choice-btn">
+                            <span><span class="choice-label">A.</span>孤注一掷，全部积蓄投入</span>
+                            <span class="choice-effect">
+                                <span class="effect-bad">💰 -30</span>
+                                <span class="effect-good">🔥 +10</span>
+                            </span>
+                        </button>
+                        <button class="pixel-btn choice-btn">
+                            <span><span class="choice-label">B.</span>边上班边做副业，稳扎稳打</span>
+                            <span class="choice-effect">
+                                <span class="effect-bad">💰 -10</span>
+                                <span class="effect-bad">🔥 -5</span>
+                            </span>
+                        </button>
+                        <button class="pixel-btn choice-btn">
+                            <span><span class="choice-label">C.</span>找合伙人一起分担</span>
+                            <span class="choice-effect">
+                                <span class="effect-neutral">👥 +2</span>
+                                <span class="effect-bad">💰 -15</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="status-panel pixel-box">
+                    <div class="status-title">企业状态</div>
+                    <div class="stat-row">
+                        <div class="stat-label">
+                            <span>💰 资金</span>
+                            <span>50</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill" style="width: 50%;"></div>
+                            <span class="stat-value">50/100</span>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-label">
+                            <span>👥 团队</span>
+                            <span>3</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill" style="width: 30%;"></div>
+                            <span class="stat-value">3/10</span>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-label">
+                            <span>📊 市场</span>
+                            <span>0%</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill" style="width: 5%;"></div>
+                            <span class="stat-value">5/100</span>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-label">
+                            <span>🔥 士气</span>
+                            <span>80</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill" style="width: 80%;"></div>
+                            <span class="stat-value">80/100</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 复盘界面 -->
+        <div id="screen-review" class="screen">
+            <div class="pixel-box" style="padding: 24px;">
+                <div class="review-nav">
+                    <button class="pixel-btn">← 上一个</button>
+                    <span style="color: var(--accent); font-size: 12px;">复盘 · 节点 1/7</span>
+                    <button class="pixel-btn">下一个 →</button>
+                </div>
+                <div class="review-grid">
+                    <div class="review-card yours">
+                        <div class="review-label" style="color: var(--accent);">你的选择</div>
+                        <div class="review-choice">边上班边做副业，稳扎稳打</div>
+                    </div>
+                    <div class="review-card history">
+                        <div class="review-label" style="color: var(--success);">历史选择</div>
+                        <div class="review-choice">孤注一掷，全部积蓄投入</div>
+                    </div>
+                </div>
+                <div class="review-note">
+                    <strong>深度解读：</strong>历史上李风认为，互联网窗口期极短，必须 all in 抢占先机。边上班边做虽然稳妥，但可能错过最佳时机。这个选择背后的核心逻辑是：在机会窗口明确的领域，速度比安全更重要。
+                </div>
+                <div style="text-align: center;">
+                    <button class="pixel-btn primary" onclick="showScreen('select')">返回角色选择</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 反馈弹窗 -->
+    <div id="feedback-modal" class="modal-overlay active">
+        <div class="modal">
+            <div class="modal-title">⚡ 决策生效</div>
+            <div class="modal-text">
+                你租了间小办公室，没日没夜地写代码。3个月后，产品终于上线了，但资金已经见底...
+            </div>
+            <div class="modal-effects">
+                <span class="effect-tag" style="border-color: var(--danger); color: var(--danger);">💰 资金 -30</span>
+                <span class="effect-tag" style="border-color: var(--success); color: var(--success);">🔥 士气 +10</span>
+            </div>
+            <button class="pixel-btn primary" onclick="closeModal()">继续 →</button>
+        </div>
+    </div>
+
+    <!-- 流程图：动态锁选项机制 -->
+    <div style="max-width:1000px;margin:0 auto 48px;padding:0 24px;">
+        <div class="card">
+            <h2>流程图 · 动态锁选项机制</h2>
+            <div style="background:#1a1a2e;border-radius:8px;padding:20px;border:1px solid #2a2a3e;overflow-x:auto;">
+                <pre style="font-family:'Press Start 2P','Courier New',monospace;font-size:10px;line-height:1.8;color:#c0c0d0;white-space:pre;">
+
+    ┌──────────────────────────────────────┐
+    │        加载当前故事节点                │
+    │  (节点ID / 叙事/ 所有选项)             │
+    └────────────────┬─────────────────────┘
+                     │
+                     ▼
+    ┌──────────────────────────────────────┐
+    │      读取玩家当前属性状态              │
+    │  💰资金  👥团队  📊市场  🔥士气  🧠压力│
+    └────────────────┬─────────────────────┘
+                     │
+                     ▼
+    ┌──────────────────────────────────────┐
+    │      ⚠️ 检查失败阈值                  │
+    │                                      │
+    │  资金≤0? → 破产结局                   │
+    │  团队≤3? → 解散结局                   │
+    │  士气≤15? → 涣散结局                  │
+    │  压力≥90? → 崩溃结局                  │
+    │                                      │
+    │  任一为是 → 跳转结局画面              │
+    │  全部为否 → 继续                     │
+    └────────────────┬─────────────────────┘
+                     │ (全部通过)
+                     ▼
+    ┌──────────────────────────────────────────┐
+    │     🔒 检查选项锁定条件                  │
+    │                                          │
+    │  遍历每个选项的 lockConditions 字段:       │
+    │                                          │
+    │  例: 选项A → { 资金&lt;30 AND 士气&lt;40 }    │
+    │    ├─ 满足? → 选项置灰/锁定              │
+    │    └─ 不满足? → 选项可用                 │
+    │                                          │
+    │  例: 选项B → { 压力&gt;70 }                 │
+    │    ├─ 满足? → 选项置灰/锁定              │
+    │    └─ 不满足? → 选项可用                 │
+    └────────────────┬─────────────────────────┘
+                     │
+                     ▼
+    ┌──────────────────────────────────────────┐
+    │        渲染可用选项列表                   │
+    │                                          │
+    │  ✅ A. 高风险/高回报    ← 可用           │
+    │  ⛔ B. 稳健路线         ← 已锁定          │
+    │  ✅ C. 扩大团队         ← 可用           │
+    └────────────────┬─────────────────────────┘
+                     │
+                     ▼
+    ┌──────────────────────────────────────────┐
+    │         等待玩家选择                      │
+    └────────────────┬─────────────────────────┘
+                     │ (玩家点击)
+                     ▼
+    ┌──────────────────────────────────────────┐
+    │         计算属性变化                      │
+    │  资金: 50 → 35 (-15)                     │
+    │  士气: 60 → 75 (+15)                     │
+    │  压力: 40 → 55 (+15)                     │
+    └────────────────┬─────────────────────────┘
+                     │
+                     ▼
+    ┌──────────────────────────────────────────┐
+    │        显示决策反馈弹窗                   │
+    │  结果叙事 + 属性变化标签                  │
+    │  [继续 →]                               │
+    └────────────────┬─────────────────────────┘
+                     │
+                     ▼
+    ┌──────────────────────────────────────────┐
+    │        推进到下一节点                     │
+    │                                          │
+    │  当前是节点7?                            │
+    │   ├─ 是 → 进入复盘模式                   │
+    │   └─ 否 → 加载下一节点(回到顶部)         │
+    └──────────────────────────────────────────┘</pre>
+            </div>
+            <p style="margin-top:12px;font-size:10px;color:#888;line-height:1.8;">
+                💡 核心逻辑：<br>
+                1. 每轮先检查<strong style="color:#ff4d6d;">失败阈值</strong>，任一属性越线则直接结束<br>
+                2. 再检查<strong style="color:#ffcc00;">锁定条件</strong>，根据组合条件禁用部分选项<br>
+                3. 玩家在剩余选项中做选择 → 计算新状态 → 进入下一轮
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + screenName).classList.add('active');
+        }
+
+        function startGame(charId) {
+            showScreen('game');
+        }
+
+        function closeModal() {
+            document.getElementById('feedback-modal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

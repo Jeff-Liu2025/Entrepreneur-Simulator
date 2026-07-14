@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创业模拟器 · 像素版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>创业模拟器</h1>
+            <p>回到那个关键节点，做出你的选择</p>
+        </div>
+
+        <!-- 角色选择界面 -->
+        <div id="screen-select" class="screen active">
+            <div class="pixel-box" style="text-align: center; padding: 20px;">
+                <p style="font-size: 12px; color: var(--accent);">选择你想体验的人生</p>
+            </div>
+            <div id="char-grid" class="char-grid"></div>
+        </div>
+
+        <!-- 游戏主界面 -->
+        <div id="screen-game" class="screen">
+            <!-- 场景背景层 -->
+            <div id="scene-layer" class="scene-layer">
+                <div class="scene-overlay"></div>
+            </div>
+
+            <!-- 右上角状态面板 -->
+            <div id="status-panel" class="status-panel pixel-box">
+                <div class="status-title">企业状态</div>
+                <div class="stat-row">
+                    <div class="stat-label">
+                        <span id="stat-label-funds"></span>
+                        <span id="stat-value-funds"></span>
+                    </div>
+                    <div class="stat-bar">
+                        <div id="stat-fill-funds" class="stat-fill"></div>
+                        <span class="stat-value" id="stat-percent-funds"></span>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">
+                        <span id="stat-label-team"></span>
+                        <span id="stat-value-team"></span>
+                    </div>
+                    <div class="stat-bar">
+                        <div id="stat-fill-team" class="stat-fill"></div>
+                        <span class="stat-value" id="stat-percent-team"></span>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">
+                        <span id="stat-label-market"></span>
+                        <span id="stat-value-market"></span>
+                    </div>
+                    <div class="stat-bar">
+                        <div id="stat-fill-market" class="stat-fill"></div>
+                        <span class="stat-value" id="stat-percent-market"></span>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">
+                        <span id="stat-label-morale"></span>
+                        <span id="stat-value-morale"></span>
+                    </div>
+                    <div class="stat-bar">
+                        <div id="stat-fill-morale" class="stat-fill"></div>
+                        <span class="stat-value" id="stat-percent-morale"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部对话框区域 -->
+            <div class="dialog-container">
+                <div class="dialog-box pixel-box">
+                    <img id="dialog-portrait" class="dialog-portrait" src="" alt="角色立绘">
+                    <div class="dialog-content">
+                        <div class="dialog-header">
+                            <span id="node-year" class="node-year"></span>
+                            <span id="node-title" class="node-title"></span>
+                            <span id="node-progress" class="node-progress"></span>
+                        </div>
+                        <div id="narrative-text" class="dialog-text"></div>
+                        <div id="choices" class="dialog-choices"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结算评价界面 -->
+        <div id="screen-summary" class="screen">
+            <div class="summary-overlay"></div>
+            <div class="summary-container pixel-box">
+                <h2 class="summary-title">🎯 创业之旅完成</h2>
+                <div id="summary-grade" class="summary-grade"></div>
+                <div id="summary-stats" class="summary-stats"></div>
+                <div id="summary-comment" class="summary-comment"></div>
+                <div class="summary-actions">
+                    <button class="pixel-btn primary" onclick="enterReview()">查看复盘</button>
+                    <button class="pixel-btn" onclick="backToSelect()">返回首页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 复盘界面 -->
+        <div id="screen-review" class="screen">
+            <div class="review-overlay"></div>
+            <div class="review-container">
+                <div class="review-wrapper pixel-box">
+                    <div class="review-header">
+                        <h2 id="review-title"></h2>
+                        <p id="review-subtitle"></p>
+                    </div>
+                    <div class="review-nav">
+                        <button id="review-prev" class="pixel-btn">← 上一个</button>
+                        <div class="review-nav-center">
+                            <div id="review-progress" class="review-progress-text"></div>
+                            <div id="review-year" class="review-year-text"></div>
+                        </div>
+                        <button id="review-next" class="pixel-btn">下一个 →</button>
+                    </div>
+                    <div class="review-grid">
+                        <div class="review-card yours pixel-box">
+                            <div class="review-card-header">
+                                <img class="review-badge" src="assets/ui/review_ico_your.png" alt="你的选择">
+                                <div class="review-label">你的选择</div>
+                            </div>
+                            <div id="your-choice" class="review-choice"></div>
+                        </div>
+                        <div class="review-card history pixel-box">
+                            <div class="review-card-header">
+                                <img class="review-badge" src="assets/ui/review_ico_history.png" alt="历史选择">
+                                <div class="review-label">历史选择</div>
+                            </div>
+                            <div id="history-choice" class="review-choice"></div>
+                        </div>
+                    </div>
+                    <div id="review-note" class="review-note pixel-box"></div>
+                    <div class="review-actions">
+                        <button class="pixel-btn primary" onclick="backToSelect()">返回角色选择</button>
+                        <button class="pixel-btn" onclick="startGame(gameState.currentCharacter)">再玩一次</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="screen-gameover" class="screen">
+            <div class="gameover-overlay"></div>
+            <div class="gameover-container pixel-box">
+                <img id="gameover-illustration" class="gameover-illustration" src="" alt="失败插画">
+                <h2 class="gameover-title">💀 创业失败</h2>
+                <p id="gameover-reason" class="gameover-reason"></p>
+                <div class="gameover-actions">
+                    <button class="pixel-btn primary" onclick="restartGame()">重新挑战</button>
+                    <button class="pixel-btn" onclick="backToSelect()">返回首页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 反馈弹窗 -->
+    <div id="feedback-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-title">⚡ 决策生效</div>
+            <div id="modal-text" class="modal-text"></div>
+            <div id="modal-effects" class="modal-effects"></div>
+            <button id="modal-continue" class="pixel-btn primary">继续 →</button>
+        </div>
+    </div>
+
+    <!-- 存档提示 -->
+    <div id="save-notice" class="save-notice">💾 已自动存档</div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

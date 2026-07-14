@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+*.log
+.trae/
+docs/
+dogfood-output/
+visual-companion.html
+download_assets.ps1
+generate_assets.py
+test_game.py
+*.md
+!README.md

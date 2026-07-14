@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" shape-rendering="crispEdges">
+  <rect width="400" height="300" fill="#3d3228"/>
+  <rect x="0" y="0" width="400" height="200" fill="#5a4a3a"/>
+  <rect x="0" y="200" width="400" height="100" fill="#4a3a2a"/>
+  <rect x="0" y="200" width="400" height="10" fill="#6b5a4a"/>
+  
+  <rect x="0" y="0" width="400" height="10" fill="#4a3a2a"/>
+  
+  <rect x="160" y="10" width="80" height="8" fill="#8b6914"/>
+  <rect x="170" y="18" width="60" height="30" fill="#f4d03f" opacity="0.3"/>
+  <rect x="180" y="18" width="40" height="20" fill="#f4e8c1" opacity="0.5"/>
+  
+  <rect x="20" y="40" width="10" height="160" fill="#8b6e5d"/>
+  <rect x="30" y="40" width="80" height="10" fill="#a68b6d"/>
+  <rect x="30" y="110" width="80" height="10" fill="#a68b6d"/>
+  <rect x="30" y="50" width="80" height="50" fill="#6b5a4a"/>
+  <rect x="35" y="55" width="70" height="40" fill="#5a8a5a"/>
+  <rect x="40" y="60" width="30" height="20" fill="#f5cda2"/>
+  <rect x="75" y="60" width="30" height="20" fill="#5a6a8a"/>
+  <rect x="30" y="120" width="80" height="70" fill="#4a3a2a"/>
+  <rect x="35" y="125" width="70" height="55" fill="#5a4a3a"/>
+  <rect x="40" y="130" width="25" height="40" fill="#6b5a7a"/>
+  <rect x="70" y="130" width="30" height="40" fill="#5a6a8a"/>
+
+  <rect x="290" y="40" width="10" height="160" fill="#8b6e5d"/>
+  <rect x="290" y="40" width="90" height="10" fill="#a68b6d"/>
+  <rect x="290" y="110" width="90" height="10" fill="#a68b6d"/>
+  <rect x="290" y="50" width="90" height="50" fill="#6b5a4a"/>
+  <rect x="295" y="55" width="80" height="40" fill="#8a5a5a"/>
+  <rect x="300" y="60" width="30" height="20" fill="#f5cda2"/>
+  <rect x="340" y="60" width="30" height="20" fill="#5a8a5a"/>
+  <rect x="290" y="120" width="90" height="70" fill="#4a3a2a"/>
+  <rect x="295" y="125" width="80" height="55" fill="#5a4a3a"/>
+  <rect x="300" y="130" width="35" height="40" fill="#8a6a5a"/>
+  <rect x="345" y="130" width="25" height="40" fill="#6a5a7a"/>
+
+  <rect x="140" y="130" width="120" height="70" fill="#3d4a5a"/>
+  <rect x="140" y="130" width="120" height="8" fill="#5a6a7a"/>
+  <rect x="150" y="145" width="100" height="40" fill="#1a2530"/>
+  <rect x="155" y="150" width="40" height="5" fill="#4ade80"/>
+  <rect x="155" y="160" width="60" height="4" fill="#5d8aff"/>
+  <rect x="155" y="170" width="50" height="4" fill="#f4d03f"/>
+  <rect x="195" y="185" width="10" height="15" fill="#2a2a2a"/>
+
+  <rect x="130" y="200" width="140" height="20" fill="#8b6e5d"/>
+  <rect x="135" y="205" width="130" height="10" fill="#a68b6d"/>
+
+  <rect x="145" y="210" width="15" height="10" fill="#e67e22"/>
+  <rect x="147" y="207" width="11" height="3" fill="#f5cda2"/>
+  <rect x="170" y="210" width="15" height="10" fill="#e67e22"/>
+  <rect x="172" y="207" width="11" height="3" fill="#f5cda2"/>
+  <rect x="240" y="210" width="15" height="10" fill="#e67e22"/>
+  <rect x="242" y="207" width="11" height="3" fill="#f5cda2"/>
+
+  <rect x="200" y="215" width="25" height="15" fill="#c0392b"/>
+  <rect x="203" y="218" width="19" height="9" fill="#e74c3c"/>
+
+  <rect x="150" y="30" width="70" height="50" fill="#f4e8c1" opacity="0.15"/>
+  <rect x="140" y="80" width="90" height="120" fill="#f4e8c1" opacity="0.08"/>
+
+  <rect x="20" y="210" width="10" height="10" fill="#2d3a4a"/>
+  <rect x="370" y="210" width="10" height="10" fill="#2d3a4a"/>
+  <rect x="50" y="220" width="20" height="10" fill="#5d8aff"/>
+  <rect x="330" y="220" width="20" height="10" fill="#5d8aff"/>
+
+  <rect x="130" y="50" width="10" height="70" fill="#8b6e5d"/>
+  <rect x="260" y="50" width="10" height="70" fill="#8b6e5d"/>
+
+  <rect x="145" y="60" width="5" height="5" fill="#f4d03f"/>
+  <rect x="250" y="60" width="5" height="5" fill="#f4d03f"/>
+  <rect x="145" y="75" width="5" height="5" fill="#5d8aff"/>
+  <rect x="250" y="75" width="5" height="5" fill="#4ade80"/>
+  <rect x="145" y="90" width="5" height="5" fill="#ff4d6d"/>
+  <rect x="250" y="90" width="5" height="5" fill="#f4d03f"/>
+</svg>
